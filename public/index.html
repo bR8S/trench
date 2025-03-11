@@ -3,9 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>trench</title>
+    <title>trench.co | Never Stop Digging</title>
+    <link rel="icon" href="images/vinyl.jpg" type="image/jpg" />
 </head>
 <body>
+    <div style="display: none;" class="custom-cursor"></div>
+    <div class="progress-bar__wrapper">
+        <img class="logo" src="images/trench-logo-2.png">
+        <div class="progress-bar__container">
+            <p class="progress-bar__text">Hold tight while we dig through the vaults. <br><span class="progress-bar__sub-text"><span class="progress-bar__text-progress"></span>/<span class="progress-bar__text-total"></span> collections locked in so far—deep cuts incoming.</span></p>
+            <div class="progress-bar__bar">
+                <div class="progress-bar__progress"></div>
+            </div>
+        </div>
+    </div>
     <div class="container">
         <img class="logo" src="images/trench-logo-2.png">
         <p>Enter a Bandcamp track URL to scrape the collections of all its supporters.</p>
@@ -14,21 +25,27 @@
             <input type="url" class="url-input__input" id="bandcampUrl" placeholder="Enter Bandcamp URL" required />
             <div class="url-input__submit">Submit</div>
         </div>
-
-        <div id="result"></div>
     </div>
-
-    <div class="tracks">
+    <div class="results-wrapper">
+        <h2 class="results-header">RESULTS</h2>
+        <div class="tracks-wrapper">
+            <div class="tracks">
+            </div>
+        </div>
     </div>
 </body>
 </html>
 
 <style>
+    :root {
+        --primary-color: #121212;
+        --accent-color: #fff;
+    }
     body {
-        position: fixed;
         top: 0;
-        background-color: #000;
-        color: #fff;
+        background-blend-mode: color-dodge;
+        background-image: radial-gradient(circle at 60% 40%, rgba(192, 57, 43, 0.5), rgba(255, 165, 0, 0.3), rgba(0, 0, 0, 0.9)), linear-gradient(110deg, rgba(20, 20, 20, 0.95) 10%, rgba(20, 20, 20, 0.8) 50%, rgba(40, 40, 40, 0.6) 90%), url(images/noise_lt.svg);
+        color: var(--accent-color);
         font-family: monospace;
         height: 100vh;
         width: 100vw;
@@ -37,14 +54,34 @@
         overflow: hidden;
         font-size: 16px;
     }
+    .custom-cursor {
+        position: absolute;
+        background-color: var(--accent-color);
+        transform: translate(-50%, -50%);
+        height: 14px;
+        width: 14px;
+        border-radius: 50%;
+        z-index: 1000;
+    }
     .container {
+        height: 100vh;
         position: relative;
         text-align: center;
-        transform: translateY(-50%);
-        top: 50%;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+        align-items: center;
+        justify-content: center;
+    }
+    .container.show-results {
+        height: calc(100vh - 212px);
+        top: 0;
     }
     .logo {
-        height: 60px;
+        height: 80px;
+    }
+    .container p {
+        margin: 0;
     }
     .url-input {
         display: flex;
@@ -52,69 +89,125 @@
         align-items: center;
         justify-content: center;
         gap: 20px;
-        margin-top: 32px;
+        margin-top: 0;
     }
     .url-input input {
-        background-color: #fff;
+        background-color: transparent;
         outline: none;
-        border: 1px solid #fff;
+        border: 1px solid var(--accent-color);
         padding: 12px 16px 12px 20px;
-        color: #000;
+        color: var(--accent-color);
         font-family: monospace;
         width: 450px;
         border-radius: 25px;
         font-size: 16px;
+        transition: all 0.2s ease-in-out;
+    }
+    .url-input input:hover {
+        background-color: var(--accent-color);
+        color: var(--primary-color);
+    }
+    .url-input input:hover::placeholder {
+        color: var(--primary-color);
+    }
+    .url-input input:focus {
+        background-color: var(--accent-color);
+        color: var(--primary-color);
+    }
+    .url-input input:focus::placeholder {
+        color: var(--primary-color);
     }
     .url-input input::placeholder {
-        color: #000;
+        color: var(--accent-color);
     }
     .url-input__submit {
         padding: 12px 24px;
         border-radius: 25px;
-        border: 2px solid #fff;
-        cursor: pointer;
-        color: #fff;
+        border: 1px solid var(--accent-color);
+        background-color: transparent;
+        color: var(--accent-color);
         font-size: 16px;
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+    }
+    .url-input__submit:hover {
+        background-color: var(--accent-color);
+        color: var(--primary-color);
+    }
+    .results-wrapper {
+        display: none;
+        position: absolute;
+        bottom: 20px;
+        height: fit-content;
+        width: 100%;
+    }
+    .results-wrapper.show {
+        display: block;
+    }
+    .results-header {
+        margin-left: 20px;
     }
     .tracks {
-        overflow: scroll;
         display: flex;
         flex-direction: column;
         flex-wrap: wrap;
-        height: 222px;
+        height: 184px;
+        width: fit-content;
+        min-width: max-content;
         gap: 20px;
-        position: absolute;
-        bottom: 20px;
-        left: 20px;
-
+        transform: rotateX(180deg);
+    }
+    .tracks-wrapper {
+        height: fit-content;
+        width: calc(100% - 40px);
+        padding: 0 20px 20px;
+        overflow: scroll;
+        overflow-y: hidden;
+        transform: rotateX(180deg);
+    }
+    .tracks-wrapper::-webkit-scrollbar {
+        height: 8px;
+    }
+    .tracks-wrapper::-webkit-scrollbar-track {
+        background: transparent;
+        border: 1px solid var(--accent-color);
+        border-radius: 20px;
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+    .tracks-wrapper::-webkit-scrollbar-thumb {
+        background: var(--accent-color);
+        border-radius: 20px;
     }
     .track {
         display: flex;
         align-items: center;
-        width: 600px;
-        height: 90px;
-        border-radius: 100px;
-        border: 1px solid #fff;
-        padding: 0 10px;
+        width: 540px;
+        height: 60px;
+        border-radius: 60px;
+        border: 1px solid var(--accent-color);
+        padding: 10px;
         position: relative;
         transition: all 0.2s ease-in-out;
         cursor: pointer;
+        color: var(--accent-color);
+        text-decoration: none;
     }
     .track__img {
         border-radius: 50%;
-        width: 70px;
+        height: 100%;
         margin-right: 16px;
-        border: 2px solid #fff;
+        border: 1px solid var(--accent-color);
     }
     .track h3, .track p {
         margin: 0;
     }
     .track h3 {
-        margin-bottom: 8px;
-        font-size: 16px;
+        margin-bottom: 6px;
+        font-size: 18px;
     }
     .track h3 span svg {
-        fill: #fff;
+        fill: var(--accent-color);
         top: 4px;
         left: -4px;
         position: relative;
@@ -129,24 +222,89 @@
     }
     .track__arrow {
         position: absolute;
-        right: 18px;
+        right: 12px;
     }
     .track__arrow svg {
-        fill: #000;
+        fill: transparent;
     }
     .track:hover {
-        background-color: #fff;
-        color: #000;
+        background-color: var(--accent-color);
+        color: var(--primary-color);
     }
     .track:hover .track__img {
-        border: 2px solid #000;
+        border: 1px solid var(--primary-color);
         animation: rotateImg 2.25s infinite 0.3s linear;
     }
     .track:hover .track__arrow svg {
-        fill: #000;
+        fill: #746754;
     }
     .track:hover .track__text h3 span svg {
-        fill: #000 !important;
+        fill: var(--primary-color);
+    }
+    .progress-bar__wrapper {
+        display: none;
+        position: fixed;
+        height: 100vh;
+        width: 100vw;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        background-color: #232323ad;
+        background-blend-mode: color-dodge;
+        background-image: radial-gradient(circle at 60% 40%, rgba(192, 57, 43, 0.5), rgba(255, 165, 0, 0.3), rgba(0, 0, 0, 0.9)), linear-gradient(110deg, rgba(20, 20, 20, 0.95) 10%, rgba(20, 20, 20, 0.8) 50%, rgba(40, 40, 40, 0.6) 90%), url(images/noise_lt.svg);
+    }
+    .progress-bar__wrapper .logo {   
+        position: absolute;
+        height: 30px;
+        margin-left: 20px;
+        margin-top: 20px;
+    }
+    .progress-bar__container {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        position: relative;
+        max-width: 600px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .progress-bar__bar {
+        background-color: transparent;
+        border: 1px solid var(--accent-color);
+        border-radius: 25px;
+        height: 20px;
+        width: 500px;
+        position: relative;
+    }
+    .progress-bar__progress {
+        position: absolute;
+        width: 0;
+        height: calc(100% - 4px);
+        background-color: var(--accent-color);
+        border-radius: 25px 0 0px 25px;
+        margin: 2px;
+        transition: all 2s linear;
+        /*
+        animation: flashingProgressBar 3.25s infinite 0s linear;
+        */
+    }
+    .progress-bar__progress-tip {
+        position: absolute;
+        left: 10px;
+        background-color: var(--accent-color);
+        width: 40px;
+        border-radius: 50%;
+        height: calc(100% - 4px);
+        display: none;
+    }
+    .progress-bar__text {
+        width: 700px;
+        text-align: center;
+        margin-bottom: 32px;
+        line-height: 1.8;
+        font-size: 18px;
     }
     @keyframes rotateImg {
         0% {
@@ -156,50 +314,146 @@
             transform: rotate(360deg)
         }
     }
+    @keyframes flashingProgressBar {
+        0% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
 </style>
 
 <script>
-    const submitBtn = document.querySelector('.url-input__submit')
-    handleSubmitClick()
+    // CUSTOM CURSOR
+    const cursor = document.querySelector('.custom-cursor')
 
+    document.addEventListener('mousemove', event => {
+        const cursorX = event.clientX
+        const cursorY = event.clientY
+
+        cursor.style.left = `${cursorX}px`
+        cursor.style.top = `${cursorY}px`
+    })
+</script>
+
+<script>
     function handleSubmitClick(){
         submitBtn.addEventListener('click', handleTrackScrape)
     }
 
+    function handleProgressionBar(progress, total) {
+        const percentage = (progress / total) * 100;
+        const progressBar = document.querySelector('.progress-bar__wrapper')
+        const progressBarProgression = document.querySelector('.progress-bar__progress')
+        const progressBarProgressText = document.querySelector('.progress-bar__text-progress')
+        const progressBarTotalText = document.querySelector('.progress-bar__text-total')
+        const progressBarSubText = document.querySelector('.progress-bar__sub-text')
+
+        // Update the progress bar
+        progressBarProgression.style.width = `${percentage}%`;
+
+        if(progress === undefined || total === undefined){
+            progressBarSubText.style.display = 'none'
+        } else {
+            progressBarSubText.style.display = 'block'
+        }
+        progressBarProgressText.innerText = progress
+        progressBarTotalText.innerText = total
+
+        if(percentage === 100){
+            progressBar.style.display = 'none'
+        }
+    }
+
     async function handleTrackScrape() {
+        progressOverlay.style.display = 'block'
         const urlInput = document.querySelector('.url-input__input')
         const urlVal = urlInput.value
 
-        const scrapeData = await fetch(`/scrape?url=${urlVal}`)
-        const scrapeDataJson = await scrapeData.json()
+        if(urlVal !== ''){
+            const scrapeSource = new EventSource(`/scrape-progress`)
 
-        console.log(scrapeDataJson)
-        const tracksElem = document.querySelector('.tracks')
+            scrapeSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleProgressionBar(data.progress, data.total)
+            }   
 
-        scrapeDataJson.forEach(track => {
-            const trackElem = document.createElement('a')
-            trackElem.classList.add('track')
-            trackElem.href = track.track.link
-            trackElem.innerHTML = ` <img class="track__img" src="${track.track.imageUrl}">
-                                    <div class="track__text">
-                                        <h3>${track.track.title} 
-                                            <span> / ${track.count} 
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M15 12c0 1.654-1.346 3-3 3s-3-1.346-3-3 1.346-3 3-3 3 1.346 3 3zm9-.449s-4.252 8.449-11.985 8.449c-7.18 0-12.015-8.449-12.015-8.449s4.446-7.551 12.015-7.551c7.694 0 11.985 7.551 11.985 7.551zm-7 .449c0-2.757-2.243-5-5-5s-5 2.243-5 5 2.243 5 5 5 5-2.243 5-5z"/></svg>
-                                            </span>
-                                            </h3>
-                                        <p>${track.track.artist}</p>
-                                    </div>
-                                    <div class="track__arrow">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 45 45" fill="none">
-                                        <circle cx="22.5" cy="22.5" r="22" stroke="white"/>
-                                        <line x1="9.98959" y1="22.5" x2="34.0104" y2="22.5" stroke="white" stroke-width="2"/>
-                                        <line x1="33.4264" y1="22.0692" x2="19.9913" y2="12.6618" stroke="white" stroke-width="2"/>
-                                        <line x1="33.5736" y1="23.0692" x2="20.1385" y2="32.4765" stroke="white" stroke-width="2"/>
-                                        </svg>
-                                    </div>
-                                    `;
-            tracksElem.appendChild(trackElem)
-        })
+            const scrapeData = await fetch(`/scrape?url=${urlVal}`)
+            const scrapeDataJson = await scrapeData.json()
+            const scrapeDataTop10 = scrapeDataJson.slice(1, 11)
+            progressOverlay.style.display = 'block'
 
+            const tracksElem = document.querySelector('.tracks')
+            tracksElem.innerHTML = ''
+
+            console.log(scrapeDataJson)
+
+            scrapeDataTop10.forEach(track => {
+                const trackElem = document.createElement('a')
+                trackElem.classList.add('track')
+                trackElem.classList.add('custom-cursor-hover')
+                trackElem.href = track.track.link
+                trackElem.target = '_blank'
+                trackElem.innerHTML = ` <img class="track__img" src="${track.track.imageUrl}">
+                                        <div class="track__text">
+                                            <h3>${track.track.title} 
+                                                <span> / ${track.count} 
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M15 12c0 1.654-1.346 3-3 3s-3-1.346-3-3 1.346-3 3-3 3 1.346 3 3zm9-.449s-4.252 8.449-11.985 8.449c-7.18 0-12.015-8.449-12.015-8.449s4.446-7.551 12.015-7.551c7.694 0 11.985 7.551 11.985 7.551zm-7 .449c0-2.757-2.243-5-5-5s-5 2.243-5 5 2.243 5 5 5 5-2.243 5-5z"/></svg>
+                                                </span>
+                                                </h3>
+                                            <p>${track.track.artist}</p>
+                                        </div>
+                                        <div class="track__arrow">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 45 45" fill="none">
+                                            <circle cx="22.5" cy="22.5" r="22" stroke="white"/>
+                                            <line x1="9.98959" y1="22.5" x2="34.0104" y2="22.5" stroke="white" stroke-width="2"/>
+                                            <line x1="33.4264" y1="22.0692" x2="19.9913" y2="12.6618" stroke="white" stroke-width="2"/>
+                                            <line x1="33.5736" y1="23.0692" x2="20.1385" y2="32.4765" stroke="white" stroke-width="2"/>
+                                            </svg>
+                                        </div>
+                                        `;
+                tracksElem.appendChild(trackElem)
+            })
+            
+            const resultsWrapper = document.querySelector('.results-wrapper')
+            const container = document.querySelector('.container')
+
+            resultsWrapper.classList.add('show')
+            container.classList.add('show-results')
+        }
     }
+
+    const submitBtn = document.querySelector('.url-input__submit')
+    const progressOverlay = document.querySelector('.progress-bar__wrapper')
+
+    handleSubmitClick()
+</script>
+
+<script>
+    let minOpacity = 0.3;
+    let maxOpacity = 0.45;
+    let duration = 4000; // One full pulse cycle
+
+    let bodyElem = document.querySelector('body');
+    let overlayElem = document.querySelector('.progress-bar__wrapper')
+
+    function animate(timestamp) {
+        let progress = (timestamp % duration) / duration; // Normalize time to a [0,1] range
+        let wave = (Math.sin(progress * Math.PI * 2 - Math.PI / 2) + 1) / 2; // Sine wave from -1 to 1, remapped to [0,1]
+        
+        let currOpacity = minOpacity + wave * (maxOpacity - minOpacity); // Apply opacity wave
+
+        // Apply new background with updated opacity
+        bodyElem.style.backgroundImage = `radial-gradient(circle at 60% 40%, rgba(192, 57, 43, 0.5), rgba(255, 165, 0, ${currOpacity}), rgba(0, 0, 0, 0.9)), linear-gradient(110deg, rgba(20, 20, 20, 0.95) 10%, rgba(20, 20, 20, 0.8) 50%, rgba(40, 40, 40, 0.6) 90%), url(images/noise_lt.svg)`
+        overlayElem.style.backgroundImage = `radial-gradient(circle at 60% 40%, rgba(192, 57, 43, 0.5), rgba(255, 165, 0, ${currOpacity}), rgba(0, 0, 0, 0.9)), linear-gradient(110deg, rgba(20, 20, 20, 0.95) 10%, rgba(20, 20, 20, 0.8) 50%, rgba(40, 40, 40, 0.6) 90%), url(images/noise_lt.svg)`
+
+        requestAnimationFrame(animate);
+    }
+
+    // Start animation
+    requestAnimationFrame(animate);
 </script>
