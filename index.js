@@ -193,8 +193,9 @@ app.get('/scrape', async (req, res) => {
 
         // Launch browser
         const browser = await puppeteer.launch({
-            headless: false, // Set to 'false' if you want to see the browser interact
-            args: ['--no-sandbox', '--disable-setuid-sandbox'] // For better performance
+            headless: 'new', // Set to 'false' if you want to see the browser interact
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+	
         });
 
         const MAX_CONCURRENCY_LIMIT = 3

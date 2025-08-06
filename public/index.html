@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>trench.co | Never Stop Digging</title>
+    <title>trench | Never Stop Digging</title>
     <link rel="icon" href="images/vinyl.jpg" type="image/jpg" />
 </head>
 <body>
@@ -328,19 +328,6 @@
 </style>
 
 <script>
-    // CUSTOM CURSOR
-    const cursor = document.querySelector('.custom-cursor')
-
-    document.addEventListener('mousemove', event => {
-        const cursorX = event.clientX
-        const cursorY = event.clientY
-
-        cursor.style.left = `${cursorX}px`
-        cursor.style.top = `${cursorY}px`
-    })
-</script>
-
-<script>
     function handleSubmitClick(){
         submitBtn.addEventListener('click', handleTrackScrape)
     }
@@ -380,6 +367,9 @@
             scrapeSource.onmessage = (event) => {
                 const data = JSON.parse(event.data);
                 handleProgressionBar(data.progress, data.total)
+                if(data.total != 0){
+
+                }
             }   
 
             const scrapeData = await fetch(`/scrape?url=${urlVal}`)
